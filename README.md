@@ -20,21 +20,25 @@ const pool = new VanderPool(8, 1000);
 // function(buffer, byteOffset, byteLength)
 
 // you can pass the params directly to a DataView constructor
-let dv = vp.allocate((buf, bo, bl) => 
-    new DataView(buf, bo, bl));
-
-// keep in mind that TypedArrays expect an item length, not a byte length
-let f32arr = vp.allocate((buf, bo, bl) => 
-    new Float32Array(buf, bo, bl/Float32Array.BYTES_PER_ELEMENT));
-// (also keep in mind if you're using TypedArrays the byte length of VanderPool members
-// must be an even multiple of the byte length of an element in that array)
+let dv = pool.allocate((buf, bo, bl) => new DataView(buf, bo, bl));
 
 // or to any arbitrary object you want to use
-let myObj = vp.allocate(myObjFactory);
+let myObj = pool.allocate(myObjFactory);
 
 // once you're done with it, call free with the offset:
 pool.free(dv.byteOffset);
+
 // (don't forget to keep track of this if you're using a custom object during allocations)
+// keep in mind that TypedArrays expect an item length, not a byte length
+let f32arr = pool.allocate((buf, bo, bl) => new Float32Array(buf, bo, 2));
+
+// Also keep in mind if you're using TypedArrays the byte length of VanderPool members
+// must be even multiples of the typed array's BYTES_PER_ELEMENT 
+let pool2 = new VanderPool(7, 1000);
+// the first one will work...
+let f32arr = pool.allocate((buf, bo, bl) => new Float32Array(buf, bo, 1));
+// but the second one will crap out
+let f32arr2 = pool.allocate((buf, bo, bl) => new Float32Array(buf, bo, 1)); // RangeError
 ```
 
 License
