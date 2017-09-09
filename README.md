@@ -17,14 +17,23 @@ const BYTE_LENGTH = 7; // this is how long each data segment is, in bytes
 // suppose we want a pool of 1000 items
 const pool = new VanderPool(1000, BYTE_LENGTH);
 
-// the allocate method returns a byte offset, which we can use to create a new DataView
-let dv = new DataView(pool.buffer, pool.allocate(), BYTE_LENGTH);
+// VanderPool's allocator accepts a callback in the form 
+// function(buffer, byteOffset, byteLength)
 
-// this could just as easily be a TypedArray (keeping in mind normal TypedArray rules)
-let i8 = new Int8Array(pool.buffer, pool.allocate(), BYTE_LENGTH);
+// you can pass the params directly to a DataView constructor
+let dv = vp.allocate((buf, bo, bl) => 
+    new DataView(buf, bo, bl));
+
+// keep in mind that TypedArrays expect an item length, not a byte length
+let f32arr = vp.allocate((buf, bo, bl) => 
+    new Float32Array(buf, bo, bl/Float32Array.BYTES_PER_ELEMENT));
+
+// or to any arbitrary object you want to use
+let myObj = vp.allocate(myObjFactory);
 
 // once you're done with it, call free with the offset:
 pool.free(dv.byteOffset);
+// (don't forget to keep track of this if you're using a custom object during allocations)
 ```
 
 License
