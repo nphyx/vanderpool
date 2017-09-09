@@ -11,7 +11,11 @@ VanderPool gives you the one big ArrayBuffer and a safe, reliable, fast way to m
 Usage
 -----
 ```javascript
-let VanderPool = require("vanderpool");
+// ES6 style
+import VanderPool from "vanderpool/src";
+
+// or commonJS style (the index.js in the project root is transpiled and webpacked)
+let VanderPool = require("vanderpool").default;
 
 // suppose we want a pool of 1000 items of 8 bytes each
 const pool = new VanderPool(8, 1000);
