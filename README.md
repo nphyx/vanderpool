@@ -13,9 +13,8 @@ Usage
 ```javascript
 let VanderPool = require("vanderpool");
 
-const BYTE_LENGTH = 7; // this is how long each data segment is, in bytes 
-// suppose we want a pool of 1000 items
-const pool = new VanderPool(1000, BYTE_LENGTH);
+// suppose we want a pool of 1000 items of 8 bytes each
+const pool = new VanderPool(8, 1000);
 
 // VanderPool's allocator accepts a callback in the form 
 // function(buffer, byteOffset, byteLength)
@@ -27,6 +26,8 @@ let dv = vp.allocate((buf, bo, bl) =>
 // keep in mind that TypedArrays expect an item length, not a byte length
 let f32arr = vp.allocate((buf, bo, bl) => 
     new Float32Array(buf, bo, bl/Float32Array.BYTES_PER_ELEMENT));
+// (also keep in mind if you're using TypedArrays the byte length of VanderPool members
+// must be an even multiple of the byte length of an element in that array)
 
 // or to any arbitrary object you want to use
 let myObj = vp.allocate(myObjFactory);
